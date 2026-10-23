@@ -1,0 +1,228 @@
+; =====================================================================
+;  HWEE Brainfuck Execution Environment, written in HWASM rev. 7
+;
+;  Memory map:
+;     0x0000 .. 0x7FFF   Brainfuck source text (NUL-terminated)
+;     0x8000 .. 0xEFFF   Brainfuck tape
+;     0xF000             IP  (instruction pointer into source)
+;     0xF001             DP  (data pointer into tape)
+;     0xF002             DEPTH (bracket matching scratch register)
+; =====================================================================
+.equ IP     0xF000
+.equ DP     0xF001
+.equ DEPTH  0xF002
+.equ TAPE   0x8000
+
+boot:
+        PUSH 0
+        PUSH IP
+        STORE
+        PUSH TAPE
+        PUSH DP
+        STORE
+
+fetch:
+        PUSH IP
+        LOAD
+        LOAD                ; ( instr )
+        DUP
+        JZ halt
+        DUP
+        PUSH '+'
+        EQ
+        JNZ op_inc
+        DUP
+        PUSH '-'
+        EQ
+        JNZ op_dec
+        DUP
+        PUSH '>'
+        EQ
+        JNZ op_right
+        DUP
+        PUSH '<'
+        EQ
+        JNZ op_left
+        DUP
+        PUSH '.'
+        EQ
+        JNZ op_out
+        DUP
+        PUSH '['
+        EQ
+        JNZ op_open
+        DUP
+        PUSH ']'
+        EQ
+        JNZ op_close
+        POP                 ; not an instruction: a comment
+        JMP advance
+
+op_inc:
+        POP
+        PUSH DP
+        LOAD
+        DUP
+        LOAD
+        PUSH 1
+        ADD
+        PUSH 256
+        MOD
+        SWAP
+        STORE
+        JMP advance
+
+op_dec:
+        POP
+        PUSH DP
+        LOAD
+        DUP
+        LOAD
+        PUSH 255
+        ADD
+        PUSH 256
+        MOD
+        SWAP
+        STORE
+        JMP advance
+
+op_right:
+        POP
+        PUSH DP
+        LOAD
+        PUSH 1
+        ADD
+        PUSH DP
+        STORE
+        JMP advance
+
+op_left:
+        POP
+        PUSH DP
+        LOAD
+        PUSH 1
+        SUB
+        PUSH DP
+        STORE
+        JMP advance
+
+op_out:
+        POP
+        PUSH DP
+        LOAD
+        LOAD
+        OUT
+        JMP advance
+
+op_open:
+        POP
+        PUSH DP
+        LOAD
+        LOAD
+        JNZ advance
+        PUSH 1
+        PUSH DEPTH
+        STORE
+scan_forward:
+        PUSH IP
+        LOAD
+        PUSH 1
+        ADD
+        PUSH IP
+        STORE
+        PUSH IP
+        LOAD
+        LOAD
+        DUP
+        PUSH '['
+        EQ
+        JNZ forward_deeper
+        DUP
+        PUSH ']'
+        EQ
+        JNZ forward_shallower
+        POP
+        JMP scan_forward
+forward_deeper:
+        POP
+        PUSH DEPTH
+        LOAD
+        PUSH 1
+        ADD
+        PUSH DEPTH
+        STORE
+        JMP scan_forward
+forward_shallower:
+        POP
+        PUSH DEPTH
+        LOAD
+        PUSH 1
+        SUB
+        DUP
+        PUSH DEPTH
+        STORE
+        JZ advance
+        JMP scan_forward
+
+op_close:
+        POP
+        PUSH DP
+        LOAD
+        LOAD
+        JZ advance
+        PUSH 1
+        PUSH DEPTH
+        STORE
+scan_backward:
+        PUSH IP
+        LOAD
+        PUSH 1
+        SUB
+        PUSH IP
+        STORE
+        PUSH IP
+        LOAD
+        LOAD
+        DUP
+        PUSH ']'
+        EQ
+        JNZ backward_deeper
+        DUP
+        PUSH '['
+        EQ
+        JNZ backward_shallower
+        POP
+        JMP scan_backward
+backward_deeper:
+        POP
+        PUSH DEPTH
+        LOAD
+        PUSH 1
+        ADD
+        PUSH DEPTH
+        STORE
+        JMP scan_backward
+backward_shallower:
+        POP
+        PUSH DEPTH
+        LOAD
+        PUSH 1
+        SUB
+        DUP
+        PUSH DEPTH
+        STORE
+        JZ advance
+        JMP scan_backward
+
+advance:
+        PUSH IP
+        LOAD
+        PUSH 1
+        ADD
+        PUSH IP
+        STORE
+        JMP fetch
+
+halt:
+        POP
+        HALT

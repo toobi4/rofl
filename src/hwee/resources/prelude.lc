@@ -1,0 +1,25 @@
+# =====================================================================
+#  HWEE Lambda Prelude — Church encodings of the natural numbers
+# =====================================================================
+ZERO     := \f x. x
+SUCC     := \n f x. f (n f x)
+ADD      := \m n f x. m f (n f x)
+MUL      := \m n f. m (n f)
+POW      := \b e. e b
+
+ONE      := SUCC ZERO
+TWO      := SUCC ONE
+THREE    := SUCC TWO
+FOUR     := SUCC THREE
+FIVE     := SUCC FOUR
+SIX      := SUCC FIVE
+SEVEN    := SUCC SIX
+EIGHT    := SUCC SEVEN
+NINE     := SUCC EIGHT
+TEN      := SUCC NINE
+ELEVEN   := SUCC TEN
+TWELVE   := SUCC ELEVEN
+THIRTEEN := SUCC TWELVE
+FOURTEEN := SUCC THIRTEEN
+FIFTEEN  := SUCC FOURTEEN
+SIXTEEN  := SUCC FIFTEEN

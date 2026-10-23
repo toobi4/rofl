@@ -1,0 +1,12 @@
+{
+  "schema": "hwee/manifest@1",
+  "artifacts": {
+    "bf_interpreter.hwasm": "e5f9f8997a0617b3677f8b18f47d057d61f6431243e730f0c7f2a88464e28f27",
+    "fonts/hwee-5x7.hwfont": "5590f0b7c236ec369be2b78d805e008549e735f32013e2b75efbfb9e94b1c0c1",
+    "greeting.bf": "aa9af9ec28b3b7893f2f5c49afb9b0d9c04c3a366f2cd2d3062e908d4d88e6e5",
+    "greeting.digests.json": "403c66fb0e5733615fda0634bb143f93feedacba77e7a2a4fa9fc44bf58bda86",
+    "greeting.lc": "5cc7faeb33995a68edbf4b8cc9e56b00b9b8a0804599eaea950353131bfa0b8f",
+    "greeting.poly.json": "82cba5e469352944d4587fed0e92a7d03d7827af9b581d57fa882bce20d93cf0",
+    "prelude.lc": "fca462a38ddeb948e19bcf083fc349e9259e122d1981058232a3c0293673426a"
+  }
+}
